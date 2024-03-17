@@ -9,6 +9,7 @@ use std::borrow::Cow;
 use std::convert::TryInto;
 use std::ffi::c_void;
 use std::ffi::CStr;
+use std::ffi::CString;
 use std::os::raw::c_char;
 
 extern "C" {
@@ -92,13 +93,19 @@ impl Regex {
         let mut byte_code_len = 0isize;
         const ERROR_MSG_SIZE: isize = 128;
         let mut error_msg = [0 as c_char; ERROR_MSG_SIZE as usize];
+
+        let pattern_length = pattern.len();
+        // we must allow the string to contain null-terminators, so we can't use CString::new
+        // however, the string must still end with a null-terminator.
+        let pattern = unsafe { CString::from_vec_unchecked(pattern.as_bytes().to_vec()) };
+
         let byte_code_ptr = unsafe {
             lre_compile(
                 &mut byte_code_len as *mut isize,
                 error_msg.as_mut_ptr(),
                 ERROR_MSG_SIZE,
                 pattern.as_ptr() as *const c_char,
-                pattern.len() as isize,
+                pattern_length as isize,
                 flag.0,
                 std::ptr::null_mut(),
             )
