@@ -29,8 +29,8 @@ extern "C" {
         clen: isize,
         cbuf_type: isize,
         opaque: *mut c_void,
-    ) -> isize;
-    fn lre_get_capture_count(bc_buf: *const u8) -> isize;
+    ) -> i32;
+    fn lre_get_capture_count(bc_buf: *const u8) -> i32;
 }
 
 #[derive(Copy, Clone)]
