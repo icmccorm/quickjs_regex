@@ -103,7 +103,7 @@ impl Regex {
                 std::ptr::null_mut(),
             )
         };
-        if byte_code_ptr == std::ptr::null_mut() {
+        if byte_code_ptr.is_null() {
             return Err(ComplieError::ParseFail(
                 unsafe { CStr::from_ptr(error_msg.as_ptr()) }
                     .to_string_lossy()
@@ -229,4 +229,3 @@ impl Regex {
         Ok(slice.join(""))
     }
 }
-

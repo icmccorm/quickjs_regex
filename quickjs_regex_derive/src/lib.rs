@@ -18,7 +18,7 @@ pub fn regex(input: TokenStream) -> TokenStream {
     let regex = iter.next().expect("missing regexp.").value();
     let param = iter.next().map(|param| param.value()).unwrap_or_default();
     let mut flag = NAMED_GROUPS;
-    for ch in param.chars().next() {
+    for ch in param.chars().by_ref() {
         match ch {
             'y' => flag = flag | STICKY,
             'g' => flag = flag | GLOBAL,
