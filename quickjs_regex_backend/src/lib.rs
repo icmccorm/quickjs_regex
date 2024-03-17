@@ -59,7 +59,7 @@ pub struct Regex {
 }
 
 #[derive(Debug)]
-pub enum ComplieError {
+pub enum CompileError {
     NotUnicode,
     ByteCodeLenIsNeg,
     ParseFail(String),
@@ -89,7 +89,7 @@ fn cap_to_str<'a>(_s: &'a str, cap: &[usize]) -> Vec<&'a str> {
 }
 
 impl Regex {
-    pub fn compile(pattern: &str, flag: Flag) -> Result<Regex, ComplieError> {
+    pub fn compile(pattern: &str, flag: Flag) -> Result<Regex, CompileError> {
         let mut byte_code_len = 0isize;
         const ERROR_MSG_SIZE: isize = 128;
         let mut error_msg = [0 as c_char; ERROR_MSG_SIZE as usize];
@@ -111,7 +111,7 @@ impl Regex {
             )
         };
         if byte_code_ptr.is_null() {
-            return Err(ComplieError::ParseFail(
+            return Err(CompileError::ParseFail(
                 unsafe { CStr::from_ptr(error_msg.as_ptr()) }
                     .to_string_lossy()
                     .into_owned(),
@@ -119,7 +119,7 @@ impl Regex {
         }
         let byte_code_len = byte_code_len
             .try_into()
-            .map_err(|_| ComplieError::ByteCodeLenIsNeg)?;
+            .map_err(|_| CompileError::ByteCodeLenIsNeg)?;
         let code: Cow<'static, [u8]> =
             Cow::Owned(unsafe { Vec::from_raw_parts(byte_code_ptr, byte_code_len, byte_code_len) });
         let count = unsafe { lre_get_capture_count(code.as_ptr() as *const _) as usize };
